@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context  
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-4.0.xsd"
+	default-lazy-init="true">
+
+	<description>Shiro Configuration</description>
+
+    <!-- 加载配置属性文件 -->
+	<context:property-placeholder ignore-unresolvable="true" location="classpath:javamg.properties" />
+	
+	<!--shiro的配置，关键两点，配置SecurityManager和依赖的RealM-->
+	<!-- Shiro的Web过滤器 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<!-- <property name="loginUrl" value="${cas.server.url}?service=${cas.project.url}${adminPath}/cas" /> -->
+		<property name="loginUrl" value="${adminPath}/login" />
+		<property name="successUrl" value="${adminPath}?login" />
+		<property name="filters"><!-- 扩展自定义过滤器 -->
+            <map>
+                <entry key="cas" value-ref="casFilter"/>
+                <entry key="authc" value-ref="formAuthenticationFilter"/><!-- 将默认org.apache.shiro.web.filter.authc.FormAuthenticationFilter改为自定义的com.thinkgem.javamg.modules.sys.security.FormAuthenticationFilter -->
+            </map>
+        </property>
+		<property name="filterChainDefinitions"><!-- 过滤链定义(权限过滤器定义)   其实就是:设置url的访问权限 -->
+			<ref bean="shiroFilterChainDefinitions"/>
+		</property>
+	</bean>
+	
+	<!-- 定义 (securityManager) Shiro安全管理配置     如果用ServletContainerSessionManager,则直接依赖servlet容器的回话  -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="systemAuthorizingRealm" />
+		<property name="sessionManager" ref="sessionManager" />
+		<property name="cacheManager" ref="shiroCacheManager" />
+	</bean>
+	
+	<!-- Shiro权限过滤过滤器定义(过滤链定义)   其实就是:设置url的访问权限 -->
+	<bean name="shiroFilterChainDefinitions" class="java.lang.String">
+		<constructor-arg>
+			<value>
+				/static/** = anon
+				/userfiles/** = anon
+				${adminPath}/cas = cas<!-- 单点 -->
+				${adminPath}/login = authc<!-- 这里必须要经过认证过滤器，因为/login方法里边没有执行subject.login(token),所以就用这个过滤器来做认证 -->
+				${adminPath}/logout = logout<!-- 使用shiro提供的logout filter来做logout操作,需要定义相应的bean:id=logout class=org.apache.shiro.web.filter.authc.LogoutFilter ; 另一种方法就是：普通的action中 实现自己的logout方法，取到Subject，然后subject.logout()  而这里的/logout=anon -->
+				${adminPath}/** = user<!-- user和authc不同：当应用开启了rememberMe时,用户下次访问时可以是一个user,但绝不会是authc,因为authc是需要重新认证的 -->
+				/act/rest/service/editor/** = perms[act:model:edit]
+				/act/rest/service/model/** = perms[act:model:edit]
+				/act/rest/service/** = user
+				/ReportServer/** = user
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 单点 CAS认证过滤器 -->  
+	<bean id="casFilter" class="org.apache.shiro.cas.CasFilter">  
+		<property name="failureUrl" value="${adminPath}/login"/>
+	</bean>
+	
+	
+	<!-- 自定义会话管理配置 -->
+	<bean id="sessionManager" class="com.thinkgem.javamg.common.security.shiro.session.SessionManager"> 
+		<property name="sessionDAO" ref="sessionDAO"/>
+		<!-- 会话超时时间，单位：毫秒  -->
+		<property name="globalSessionTimeout" value="${session.sessionTimeout}"/>
+		<!-- 定时清理失效会话, 清理用户直接关闭浏览器造成的孤立会话   -->
+		<property name="sessionValidationInterval" value="${session.sessionTimeoutClean}"/>
+<!--  		<property name="sessionValidationSchedulerEnabled" value="false"/> -->
+ 		<property name="sessionValidationSchedulerEnabled" value="true"/>
+		<property name="sessionIdCookie" ref="sessionIdCookie"/>
+		<property name="sessionIdCookieEnabled" value="true"/>
+	</bean>
+	
+	<!-- 指定本系统SESSIONID, 默认为: JSESSIONID 问题: 与SERVLET容器名冲突, 如JETTY, TOMCAT 等默认JSESSIONID,
+		当跳出SHIRO SERVLET时如ERROR-PAGE容器会为JSESSIONID重新分配值导致登录会话丢失! -->
+	<bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+	    <constructor-arg name="name" value="javamg.session.id"/>
+	</bean>
+
+	<!-- 自定义Session存储容器 -->
+<!-- 	<bean id="sessionDAO" class="com.thinkgem.javamg.common.security.shiro.session.JedisSessionDAO"> -->
+<!-- 		<property name="sessionIdGenerator" ref="idGen" /> -->
+<!-- 		<property name="sessionKeyPrefix" value="${redis.keyPrefix}_session_" /> -->
+<!-- 	</bean> -->
+	<bean id="sessionDAO" class="com.thinkgem.javamg.common.security.shiro.session.CacheSessionDAO">
+		<property name="sessionIdGenerator" ref="idGen" /><!-- 其实默认就是uuid了的，这里用的自己写的IdGen类,然并卵 -->
+		<property name="activeSessionsCacheName" value="activeSessionsCache" /><!-- 该缓存名字 -->
+		<property name="cacheManager" ref="shiroCacheManager" />
+	</bean>
+	
+	
+	<!-- 定义授权缓存管理器 -->
+<!-- 	<bean id="shiroCacheManager" class="com.thinkgem.javamg.common.security.shiro.cache.SessionCacheManager" /> -->
+	<bean id="shiroCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<property name="cacheManager" ref="cacheManager"/><!-- 这里引用了spring-context.xml文件中指定的org.springframework.cache.ehcache.EhCacheManagerFactoryBean -->
+	</bean>
+	
+	<!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+	
+	<!-- AOP式方法级权限检查  开启shiro注解 -->
+<!-- 	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"> -->
+<!-- 		<property name="proxyTargetClass" value="true" /> -->
+<!-- 	</bean> -->
+	<aop:config proxy-target-class="true"/>  <!-- 这种写法也是行的，不过要注意spring.xml加上aop命名空间 -->
+	<!-- 开启shiro注解 -->
+	<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+    	<property name="securityManager" ref="securityManager"/>
+	</bean>
+	
+</beans>
