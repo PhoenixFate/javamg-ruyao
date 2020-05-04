@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.javamg.modules.rfb.dao.RfbArenaUserDao">
+    
+	<sql id="rfbArenaUserColumns">
+		a.id AS "id",
+		a.aid AS "aid",
+		a.openid AS "openid",
+		a.score AS "score",
+		a.create_date AS "createDate",
+		a.status AS "status",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rfbArenaUserJoins">
+	</sql>
+    
+	<select id="get" resultType="RfbArenaUser">
+		SELECT 
+			<include refid="rfbArenaUserColumns"/>
+		FROM rfb_arena_user a
+		<include refid="rfbArenaUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfbArenaUser">
+		SELECT 
+			<include refid="rfbArenaUserColumns"/>
+		FROM rfb_arena_user a
+		<include refid="rfbArenaUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RfbArenaUser">
+		SELECT 
+			<include refid="rfbArenaUserColumns"/>
+		FROM rfb_arena_user a
+		<include refid="rfbArenaUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO rfb_arena_user(
+			id,
+			aid,
+			openid,
+			score,
+			create_date,
+			status,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{aid},
+			#{openid},
+			#{score},
+			#{createDate},
+			#{status},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE rfb_arena_user SET 	
+			aid = #{aid},
+			openid = #{openid},
+			score = #{score},
+			status = #{status},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE rfb_arena_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

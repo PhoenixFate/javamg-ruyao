@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.javamg.modules.rfb.dao.RfbHistoryDao">
+    
+	<sql id="rfbHistoryColumns">
+		a.id AS "id",
+		a.openid AS "openid",
+		a.match_type AS "matchType",
+		a.match_code AS "matchCode",
+		a.time AS "time",
+		a.knowledges AS "knowledges",
+		a.answers AS "answers",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rfbHistoryJoins">
+	</sql>
+    
+	<select id="get" resultType="RfbHistory">
+		SELECT 
+			<include refid="rfbHistoryColumns"/>
+		FROM rfb_history a
+		<include refid="rfbHistoryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfbHistory">
+		SELECT 
+			<include refid="rfbHistoryColumns"/>
+		FROM rfb_history a
+		<include refid="rfbHistoryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RfbHistory">
+		SELECT 
+			<include refid="rfbHistoryColumns"/>
+		FROM rfb_history a
+		<include refid="rfbHistoryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO rfb_history(
+			id,
+			openid,
+			match_type,
+			match_code,
+			time,
+			knowledges,
+			answers,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{openid},
+			#{matchType},
+			#{matchCode},
+			#{time},
+			#{knowledges},
+			#{answers},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE rfb_history SET 	
+			openid = #{openid},
+			match_type = #{matchType},
+			match_code = #{matchCode},
+			time = #{time},
+			knowledges = #{knowledges},
+			answers = #{answers},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE rfb_history SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

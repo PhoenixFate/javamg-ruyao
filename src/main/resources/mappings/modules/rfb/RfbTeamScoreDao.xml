@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.javamg.modules.rfb.dao.RfbTeamScoreDao">
+    
+	<sql id="rfbTeamScoreColumns">
+		a.id AS "id",
+		a.xx AS "xx",
+		a.sm AS "sm",
+		a.cd AS "cd",
+		a.create_date AS "createDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rfbTeamScoreJoins">
+	</sql>
+    
+	<select id="get" resultType="RfbTeamScore">
+		SELECT 
+			<include refid="rfbTeamScoreColumns"/>
+		FROM rfb_team_score a
+		<include refid="rfbTeamScoreJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfbTeamScore">
+		SELECT 
+			<include refid="rfbTeamScoreColumns"/>
+		FROM rfb_team_score a
+		<include refid="rfbTeamScoreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RfbTeamScore">
+		SELECT 
+			<include refid="rfbTeamScoreColumns"/>
+		FROM rfb_team_score a
+		<include refid="rfbTeamScoreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO rfb_team_score(
+			id,
+			xx,
+			sm,
+			cd,
+			create_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{xx},
+			#{sm},
+			#{cd},
+			#{createDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE rfb_team_score SET 	
+			xx = #{xx},
+			sm = #{sm},
+			cd = #{cd},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE rfb_team_score SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

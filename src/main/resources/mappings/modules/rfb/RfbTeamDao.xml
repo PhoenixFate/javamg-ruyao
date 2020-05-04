@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.javamg.modules.rfb.dao.RfbTeamDao">
+    
+	<sql id="rfbTeamColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.title AS "title",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.status AS "status",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rfbTeamJoins">
+	</sql>
+    
+	<select id="get" resultType="RfbTeam">
+		SELECT 
+			<include refid="rfbTeamColumns"/>
+		FROM rfb_team a
+		<include refid="rfbTeamJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfbTeam">
+		SELECT 
+			<include refid="rfbTeamColumns"/>
+		FROM rfb_team a
+		<include refid="rfbTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RfbTeam">
+		SELECT 
+			<include refid="rfbTeamColumns"/>
+		FROM rfb_team a
+		<include refid="rfbTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO rfb_team(
+			id,
+			code,
+			title,
+			create_by,
+			create_date,
+			status,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{title},
+			#{createBy.id},
+			#{createDate},
+			#{status},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE rfb_team SET 	
+			code = #{code},
+			title = #{title},
+			status = #{status},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE rfb_team SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

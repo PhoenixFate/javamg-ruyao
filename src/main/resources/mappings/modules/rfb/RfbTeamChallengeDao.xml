@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.javamg.modules.rfb.dao.RfbTeamChallengeDao">
+    
+	<sql id="rfbTeamChallengeColumns">
+		a.id AS "id",
+		a.a AS "a",
+		a.b AS "b",
+		a.winner AS "winner",
+		a.status AS "status",
+		a.create_date AS "createDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rfbTeamChallengeJoins">
+	</sql>
+    
+	<select id="get" resultType="RfbTeamChallenge">
+		SELECT 
+			<include refid="rfbTeamChallengeColumns"/>
+		FROM rfb_team_challenge a
+		<include refid="rfbTeamChallengeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfbTeamChallenge">
+		SELECT 
+			<include refid="rfbTeamChallengeColumns"/>
+		FROM rfb_team_challenge a
+		<include refid="rfbTeamChallengeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RfbTeamChallenge">
+		SELECT 
+			<include refid="rfbTeamChallengeColumns"/>
+		FROM rfb_team_challenge a
+		<include refid="rfbTeamChallengeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO rfb_team_challenge(
+			id,
+			a,
+			b,
+			winner,
+			status,
+			create_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{a},
+			#{b},
+			#{winner},
+			#{status},
+			#{createDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE rfb_team_challenge SET 	
+			a = #{a},
+			b = #{b},
+			winner = #{winner},
+			status = #{status},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE rfb_team_challenge SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
