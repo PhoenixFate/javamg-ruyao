@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.javamg.modules.rfb.dao.RfbUserDao">
+    
+	<sql id="rfbUserColumns">
+		a.id AS "id",
+		a.openid AS "openid",
+		a.nickname AS "nickname",
+		a.gender AS "gender",
+		a.realname AS "realname",
+		a.phone AS "phone",
+		a.address AS "address",
+		a.city AS "city",
+		a.province AS "province",
+		a.country AS "country",
+		a.avatar_url AS "avatarUrl",
+		a.unionid AS "unionid",
+		a.best_score AS "bestScore",
+		a.use_count AS "useCount",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rfbUserJoins">
+	</sql>
+    
+	<select id="get" resultType="RfbUser">
+		SELECT 
+			<include refid="rfbUserColumns"/>
+		FROM rfb_user a
+		<include refid="rfbUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfbUser">
+		SELECT 
+			<include refid="rfbUserColumns"/>
+		FROM rfb_user a
+		<include refid="rfbUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="openid != null and openid != ''">
+				AND a.openid LIKE 
+					<if test="dbName == 'oracle'">'%'||#{openid}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{openid}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{openid},'%')</if>
+			</if>
+			<if test="nickname != null and nickname != ''">
+				AND a.nickname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{nickname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{nickname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{nickname},'%')</if>
+			</if>
+			<if test="realname != null and realname != ''">
+				AND a.realname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{realname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{realname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{realname},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RfbUser">
+		SELECT 
+			<include refid="rfbUserColumns"/>
+		FROM rfb_user a
+		<include refid="rfbUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO rfb_user(
+			id,
+			openid,
+			nickname,
+			gender,
+			realname,
+			phone,
+			address,
+			city,
+			province,
+			country,
+			avatar_url,
+			unionid,
+			best_score,
+			use_count,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{openid},
+			#{nickname},
+			#{gender},
+			#{realname},
+			#{phone},
+			#{address},
+			#{city},
+			#{province},
+			#{country},
+			#{avatarUrl},
+			#{unionid},
+			#{bestScore},
+			#{useCount},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE rfb_user SET 	
+			openid = #{openid},
+			nickname = #{nickname},
+			gender = #{gender},
+			realname = #{realname},
+			phone = #{phone},
+			address = #{address},
+			city = #{city},
+			province = #{province},
+			country = #{country},
+			avatar_url = #{avatarUrl},
+			unionid = #{unionid},
+			best_score = #{bestScore},
+			use_count = #{useCount},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE rfb_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

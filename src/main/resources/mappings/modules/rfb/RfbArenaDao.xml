@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.javamg.modules.rfb.dao.RfbArenaDao">
+    
+	<sql id="rfbArenaColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.type AS "type",
+		a.intro AS "intro",
+		a.award_title AS "awardTitle",
+		a.award_image AS "awardImage",
+		a.award_intro AS "awardIntro",
+		a.start_date AS "startDate",
+		a.end_date AS "endDate",
+		a.winner AS "winner",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.status AS "status",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rfbArenaJoins">
+	</sql>
+    
+	<select id="get" resultType="RfbArena">
+		SELECT 
+			<include refid="rfbArenaColumns"/>
+		FROM rfb_arena a
+		<include refid="rfbArenaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfbArena">
+		SELECT 
+			<include refid="rfbArenaColumns"/>
+		FROM rfb_arena a
+		<include refid="rfbArenaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RfbArena">
+		SELECT 
+			<include refid="rfbArenaColumns"/>
+		FROM rfb_arena a
+		<include refid="rfbArenaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO rfb_arena(
+			id,
+			title,
+			type,
+			intro,
+			award_title,
+			award_image,
+			award_intro,
+			start_date,
+			end_date,
+			winner,
+			create_by,
+			create_date,
+			status,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{title},
+			#{type},
+			#{intro},
+			#{awardTitle},
+			#{awardImage},
+			#{awardIntro},
+			#{startDate},
+			#{endDate},
+			#{winner},
+			#{createBy.id},
+			#{createDate},
+			#{status},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE rfb_arena SET 	
+			title = #{title},
+			type = #{type},
+			intro = #{intro},
+			award_title = #{awardTitle},
+			award_image = #{awardImage},
+			award_intro = #{awardIntro},
+			start_date = #{startDate},
+			end_date = #{endDate},
+			winner = #{winner},
+			status = #{status},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE rfb_arena SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

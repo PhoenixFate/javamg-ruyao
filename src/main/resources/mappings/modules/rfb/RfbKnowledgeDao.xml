@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.javamg.modules.rfb.dao.RfbKnowledgeDao">
+    
+	<sql id="rfbKnowledgeColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.role AS "role",
+		a.node AS "node",
+		a.title AS "title",
+		a.options AS "options",
+		a.bingo AS "bingo",
+		a.link_image AS "linkImage",
+		a.link_text AS "linkText",
+		a.hits AS "hits",
+		a.label AS "label",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u.name AS "createBy.name"
+	</sql>
+	
+	<sql id="rfbKnowledgeJoins">
+		inner join sys_user u on u.id=a.create_by
+	</sql>
+    
+	<select id="get" resultType="RfbKnowledge">
+		SELECT 
+			<include refid="rfbKnowledgeColumns"/>
+		FROM rfb_knowledge a
+		<include refid="rfbKnowledgeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RfbKnowledge">
+		SELECT 
+			<include refid="rfbKnowledgeColumns"/>
+		FROM rfb_knowledge a
+		<include refid="rfbKnowledgeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RfbKnowledge">
+		SELECT 
+			<include refid="rfbKnowledgeColumns"/>
+		FROM rfb_knowledge a
+		<include refid="rfbKnowledgeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO rfb_knowledge(
+			id,
+			type,
+			role,
+			node,
+			title,
+			options,
+			bingo,
+			link_image,
+			link_text,
+			label,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{role},
+			#{node},
+			#{title},
+			#{options},
+			#{bingo},
+			#{linkImage},
+			#{linkText},
+			#{label},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE rfb_knowledge SET 	
+			type = #{type},
+			role = #{role},
+			node = #{node},
+			title = #{title},
+			options = #{options},
+			bingo = #{bingo},
+			link_image = #{linkImage},
+			link_text = #{linkText},
+			label = #{label},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE rfb_knowledge SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
