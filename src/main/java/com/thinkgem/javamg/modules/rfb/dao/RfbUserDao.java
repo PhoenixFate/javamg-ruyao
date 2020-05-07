@@ -14,5 +14,6 @@ import com.thinkgem.javamg.modules.rfb.entity.RfbUser;
  */
 @MyBatisDao
 public interface RfbUserDao extends CrudDao<RfbUser> {
-	
+
+    RfbUser getByOpenId(String openid);
 }

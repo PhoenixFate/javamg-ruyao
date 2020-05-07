@@ -4,8 +4,6 @@
 package com.thinkgem.javamg.modules.rfb.entity;
 
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Length(min=0, max=10, message="团体代号;
-
 import com.thinkgem.javamg.common.persistence.DataEntity;
 
 /**

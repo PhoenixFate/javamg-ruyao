@@ -29,7 +29,7 @@
 				<form:input path="openid" htmlEscape="false" maxlength="64" class="input-medium"/>
 			</li>
 			<li><label>昵称：</label>
-				<form:input path="nickname" htmlEscape="false" maxlength="64" class="input-medium"/>
+				<form:input path="nickName" htmlEscape="false" maxlength="64" class="input-medium"/>
 			</li>
 			<li><label>真实姓名：</label>
 				<form:input path="realname" htmlEscape="false" maxlength="100" class="input-medium"/>
@@ -66,7 +66,7 @@
 				</td>
 
 				<td>
-					${rfbUser.nickname}
+					${rfbUser.nickName}
 				</td>
 				<td>
 					<c:if test="${rfbUser.gender==0}">

@@ -35,6 +35,15 @@
 		<include refid="rfbUserJoins"/>
 		WHERE a.id = #{id}
 	</select>
+
+
+	<select id="getByOpenId" resultType="RfbUser">
+		SELECT
+		<include refid="rfbUserColumns"/>
+		FROM rfb_user a
+		<include refid="rfbUserJoins"/>
+		WHERE a.openid = #{openid}
+	</select>
 	
 	<select id="findList" resultType="RfbUser">
 		SELECT 
@@ -51,9 +60,9 @@
 			</if>
 			<if test="nickname != null and nickname != ''">
 				AND a.nickname LIKE 
-					<if test="dbName == 'oracle'">'%'||#{nickname}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{nickname}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{nickname},'%')</if>
+					<if test="dbName == 'oracle'">'%'||#{nickName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{nickName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{nickName},'%')</if>
 			</if>
 			<if test="realname != null and realname != ''">
 				AND a.realname LIKE 
@@ -115,7 +124,7 @@
 		) VALUES (
 			#{id},
 			#{openid},
-			#{nickname},
+			#{nickName},
 			#{gender},
 			#{realname},
 			#{phone},
@@ -139,7 +148,7 @@
 	<update id="update">
 		UPDATE rfb_user SET 	
 			openid = #{openid},
-			nickname = #{nickname},
+			nickname = #{nickName},
 			gender = #{gender},
 			realname = #{realname},
 			phone = #{phone},

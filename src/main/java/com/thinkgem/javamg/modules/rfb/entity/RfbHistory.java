@@ -4,7 +4,6 @@
 package com.thinkgem.javamg.modules.rfb.entity;
 
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Length(min=0, max=11, message="用时;
 
 import com.thinkgem.javamg.common.persistence.DataEntity;
 

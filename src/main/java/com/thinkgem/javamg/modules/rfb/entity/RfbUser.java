@@ -16,7 +16,7 @@ public class RfbUser extends DataEntity<RfbUser> {
 	
 	private static final long serialVersionUID = 1L;
 	private String openid;		// 微信openid
-	private String nickname;		// 昵称
+	private String nickName;		// 昵称
 	private String gender;		// 性别
 	private String realname;		// 真实姓名
 	private String phone;		// 手机
@@ -26,8 +26,8 @@ public class RfbUser extends DataEntity<RfbUser> {
 	private String country;		// 县
 	private String avatarUrl;		// 头像
 	private String unionid;		// 唯一机制id
-	private String bestScore;		// 最好成绩
-	private String useCount;		// 使用次数
+	private Integer bestScore;		// 最好成绩
+	private Integer useCount;		// 使用次数
 	
 	public RfbUser() {
 		super();
@@ -47,12 +47,12 @@ public class RfbUser extends DataEntity<RfbUser> {
 	}
 	
 	@Length(min=1, max=64, message="昵称长度必须介于 1 和 64 之间")
-	public String getNickname() {
-		return nickname;
+	public String getNickName() {
+		return nickName;
 	}
 
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
+	public void setNickName(String nickname) {
+		this.nickName = nickname;
 	}
 	
 	@Length(min=0, max=100, message="性别长度必须介于 0 和 100 之间")
@@ -137,21 +137,22 @@ public class RfbUser extends DataEntity<RfbUser> {
 	}
 	
 	@Length(min=0, max=11, message="最好成绩长度必须介于 0 和 11 之间")
-	public String getBestScore() {
+	public Integer getBestScore() {
 		return bestScore;
 	}
 
-	public void setBestScore(String bestScore) {
+	public void setBestScore(Integer bestScore) {
 		this.bestScore = bestScore;
 	}
 	
 	@Length(min=0, max=11, message="使用次数长度必须介于 0 和 11 之间")
-	public String getUseCount() {
+	public Integer getUseCount() {
 		return useCount;
 	}
 
-	public void setUseCount(String useCount) {
+	public void setUseCount(Integer useCount) {
 		this.useCount = useCount;
 	}
-	
+
+
 }
