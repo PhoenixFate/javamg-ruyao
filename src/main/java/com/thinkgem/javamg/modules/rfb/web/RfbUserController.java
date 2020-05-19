@@ -47,7 +47,6 @@ public class RfbUserController extends BaseController {
 		return entity;
 	}
 
-
 	/**
 	 * 登录
 	 * @param
@@ -55,11 +54,9 @@ public class RfbUserController extends BaseController {
 	@ResponseBody
 	@RequestMapping(value="/login",method = RequestMethod.POST)
 	public R login( String code) {
-
 		if(code==null){
 			return R.error("code is null");
 		}
-
 		// 根据小程序穿过来的code想这个url发送请求
 		String url = WeChatConstants.URL+"?appid=" + WeChatConstants.APPID + "&secret=" + WeChatConstants.APP_SECRET + "&js_code=" + code + "&grant_type="+WeChatConstants.GRANT_TYPE;
 		System.out.println("url: "+url);
@@ -67,7 +64,6 @@ public class RfbUserController extends BaseController {
 		String str = WeChatUtils.httpRequest(url, "GET", null);
 		// 转成Json对象 获取openid
 		JSONObject jsonObject = JSONObject.parseObject(str);
-
 		// 我们需要的openid，在一个小程序中，openid是唯一的
 		if(jsonObject.get("openid")!=null){
 			String openid = jsonObject.get("openid").toString();
@@ -78,7 +74,6 @@ public class RfbUserController extends BaseController {
 		}
 		return R.error("获取openid失败");
 	}
-
 
 	@RequiresPermissions("rfb:rfbUser:view")
 	@RequestMapping(value = {"list", ""})
